@@ -78,3 +78,70 @@ How to plot a right-lateral strike slip sign like below?
 
 ## Plotting deformation field with vectors - Ridgecrest earthquakes
 This part we will plot a vectorized deformation map + shaeded dem + GNSS data + fault traces + etc ...
+
+First we use the commands similar as above to create an executable script with a name called make_map.sh
+
+Then we set up some variables inside the map
+```
+dem="dem_dsamp.grd"             # DEM file name
+gps="GPS.dat"                   # GNSS data table
+RR=`gmt grdinfo -I- $dem`       # use gmt grdinfo to get the range of longitude and latitude of the grid
+output="demo"                   # output file name
+format="jpg"                    # output file format
+```
+Then we could start plotting with the commands below. We'll first generate a basemap.
+```
+gmt begin $output $format
+    gmt basemap -JM6 $RR -Ba1f0.5
+gmt end show
+```
+<img src="demo1.jpg" width="40%">
+
+Next we'll append lines to the script before ***gmt end show***, and continue our plotting. We'll plot shaded DEM first. The ***-I+nt.3*** is used to compute the shading based on a ***N***ormalized gradient with arc***t***angent transform, then scale to an amplitude of ***.3***. The ***C***olor table is chosen to be dem.cpt.
+```
+gmt grdimage $dem -I+nt.3 -Cdem.cpt
+```
+<img src="demo2.jpg" width="40%">
+
+Following that the next step we plot we region for the area with the ***gmt coast*** command. Bellow we choose to plot ***a***ll ***N***ational boarders with ***0.5p*** thickness, ***black*** dashed dotted lines (-.-); wet region with (***-S***)light blue color; at ***f***ull ***D***efinition.  
+```
+gmt coast -Na/0.5p,black,-.- -Slightblue -Df
+```
+<img src="demo3.jpg" width="40%">
+
+Then we prepare the deformation field vector data with GMT. GMT is a strong plotting tool as well as a powerful data processing code. Below we use ***gmt grdsample*** to downsample the east and north deformation field derived from a half-space source solution for the Ridgecrest earthquake sequence (see https://topex.ucsd.edu/SV_7.1/). We chose to downsample everything to an ***I***ncrement of ***0.1*** degree and then use ***gmt grd2xyz*** to output to text tables. Then we paste two tables together and output longitude, latitude, east, north, "0", "0", "0" to the a new table to be ploted with ***gmt velo***
+```
+gmt grdsample dE.grd -I0.1 -Gtmpe.grd
+gmt grdsample dN.grd -I0.1 -Gtmpn.grd
+gmt grd2xyz tmpe.grd > tmpe.lld
+gmt grd2xyz tmpn.grd > tmpn.lld
+paste tmpe.lld tmpn.lld | awk '{print $1,$2,$3,$6,"0","0","0"}' > defo.dat
+```
+
+Next, we plot these vectors with ***gmt velo***. We chose to plot them with a ***W***idth of ***0.1p***, ***black*** color. We plot the vectors at a scale of ***0.02***, with ***A***rrow head being ***10p*** size, plain ***A***rrow at ***e***nd, and ***n***ormalized with a norm size being ***10***.
+```
+gmt velo defo.dat -W0.1p,black -Se0.02/0.65/10 -A10p+eA+n10
+```
+<img src="demo4.jpg" width="40%">
+
+Then we plot the new faults that are derived from surface fracture maps from a phase-gradient technique (see https://topex.ucsd.edu/SV_7.1/), with a ***W***idth of ***0.5p***, ***red*** line segments.
+```
+gmt plot new_faults.gmt -W0.5p,red
+```
+<img src="demo5.jpg" width="40%">
+
+At last, we plot the GNSS data that are stored in a file named GPS.dat. This time, we plot the vector lines with a ***W***idth of ***0.5p***, ***blue*** color, filling the arrow head with (-G)***black*** color, with ***A***rrow head being ***10p*** size, fancy ***a***rrow at ***e***nd, and ***n***ormalized with a norm size being ***10***.
+```
+gmt velo $gps -W1p,blue -Gblack -Se0.02/0.65/12 -A10p+ea+n10
+```
+<img src="demo6.jpg" width="40%">
+
+
+Last, we add some details like beach ball, epicenters, etc to the map.
+
+<img src="demo7.jpg" width="40%">
+
+### Bonus challenge
+
+Figure out what's inside the final map and complete the rest of the plot.
+
