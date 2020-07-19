@@ -16,13 +16,13 @@ The input file requires input of ***longitude latitude E-vel N-vel E-sig N-sig C
 
 The arrow attributes are mainly controlled by the ***-A[size]*** option with additional attributes that can be specified by 
 
-***+a*** rotation angle (of the arrow head)
+***+a*** angle (of the arrow head apex, default 30)
 
 ***+b/e/m[t/c/a/i]*** placing arrow at ***b***eginning/***e***nd/***m***iddle of the vector with symbols of ***t***erminal-line/***c***ircle/***a***rrow/ta***i***l
 
 ***+g*** filling arrow color
 
-***+p*** width of the vector line (note the common ***-W*** for ***-Se*** is the width of the uncertainty ellipse)
+***+p*** width of the vector line (note the common ***-W*** for ***-Se*** is the width of the uncertainty ellipsev and the vector segment)
 
 ***+l/r*** plotting ***l***eft or ***r***ight half of the arrow
 
@@ -53,6 +53,28 @@ If we change the ***-Se1.0/0.65/10*** to ***-Se1.0/0.99/10***, which correspond 
 If we then add a correlation of 0.5 between east and north error by replacing the ***echo*** line with ***echo "0 0 1 1 0.2 0.2 0.5" > tmp.dat***, the shape of the circle will be squeezed toward the correlated direction.
 
 <img src="vectors3.jpg" width="20%">
+
+To learn about the attributes, we'll modify based on the following lines 
+```
+echo 0 0 1 1 0.2 0.2 0.5  > tmp.dat
+JRB="-JX3/3 -R-1/2/-1/2 -Ba1f1g1"
+gmt begin vectors jpg
+    gmt velo tmp.dat $JRB -Se1.0/0.65/10 -W1p -A20p+ea
+gmt end show
+```
+This will produce an ***A***rrow with an ***a***rrow at the ***e***nd of the vector that has the size of ***20p***
+
+<img src="vectors4.jpg" width="20%">
+
+Then if we tweek the ***-A*** option to ***-A20p+ea+bi*** or ***-A20p+ea+gblue*** or ***-A20p+ea+a90*** or ***-A20p+ea+p5*** or ***-A20p+ea+l***
+
+<img src="vectors5.jpg" width="20%"> <img src="vectors6.jpg" width="20%"> <img src="vectors7.jpg" width="20%"> <img src="vectors8.jpg" width="20%"> <img src="vectors9.jpg" width="20%">
+
+### Bonus challenge
+
+How to plot a right-lateral strike slip sign like below?
+
+<img src="vectors10.jpg" width="20%">
 
 ## Plotting deformation field with vectors - Ridgecrest earthquakes
 This part we will plot a vectorized deformation map + shaeded dem + GNSS data + fault traces + etc ...
