@@ -36,14 +36,23 @@ chmod +x demo.sh
 ```
 Then open the script for editing in your script editor. Change the corresponding shell in the first line to your designated shell, and change the following lines to
 ```
-echo "0 0 1 1 0 0 0" > tmp.dat
+echo "0 0 1 1 0.2 0.2 0" > tmp.dat
 JRB="-JX3/3 -R-1/2/-1/2 -Ba1f1g1"
 gmt begin vectors jpg
     gmt velo $JRB -Se1.0/0.65/10 -W1p
 gmt end show
 ```
-The resulting plot looks like 
-<img src="vectors1.jpg" width="50%">
+Inside we are plotting with 1.0 scale, and 0.65 confidence level corresponds to 1 sigma gaussian error. The resulting plot looks like 
+
+<img src="vectors1.jpg" width="20%">
+
+If we change the ***-Se1.0/0.65/10*** to ***-Se1.0/0.99/10***, which correspond to 3 sigma, the circle will increase
+
+<img src="vectors2.jpg" width="20%">
+
+If we then add a correlation of 0.5 between east and north error by replacing the ***echo*** line with ***echo "0 0 1 1 0.2 0.2 0.5" > tmp.dat***, the shape of the circle will be squeezed toward the correlated direction.
+
+<img src="vectors3.jpg" width="20%">
 
 ## Plotting deformation field with vectors - Ridgecrest earthquakes
 This part we will plot a vectorized deformation map + shaeded dem + GNSS data + fault traces + etc ...
