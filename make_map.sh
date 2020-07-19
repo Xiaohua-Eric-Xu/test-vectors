@@ -1,15 +1,13 @@
 #!/bin/bash
 dem="dem_dsamp.grd"
 gps="GPS.dat"
-#fault="faults.gmt"
 RR=`gmt grdinfo -I- $dem`
 output="demo"
 format="jpg"
-gmt makecpt -Cdem.cpt -T-100/4000/100 -Z -D > tmp_dem.cpt 
 
 gmt begin $output $format
     gmt basemap -JM6 $RR -Ba1f0.5
-    gmt grdimage $dem -I+nt.3 -Ctmp_dem.cpt
+    gmt grdimage $dem -I+nt.3 -Cdem.cpt
     gmt coast -Na/0.5p,black,-.- -Slightblue -Df
     gmt grdsample dE.grd -I0.1 -Gtmpe.grd
     gmt grdsample dN.grd -I0.1 -Gtmpn.grd
@@ -18,7 +16,6 @@ gmt begin $output $format
     paste tmpe.lld tmpn.lld | awk '{print $1,$2,$3,$6,"0","0","0"}' > defo.dat
 
     gmt velo defo.dat -W0.1p,black -Se0.02/0.65/10 -A10p+eA+n10
-    #gmt plot $fault -W0.1p,darkgray
     gmt plot new_faults.gmt -W0.5p,red
     gmt velo $gps -W1p,blue -Gblack -Se0.02/0.65/12 -A10p+ea+n10 
 
@@ -51,8 +48,6 @@ EOF
 echo "-117.9 35.0 Mw7.1" | gmt text -F+f13,Helvetica,black+j5 -D0.2/0.2
 echo "-117.0 35.25 Mw6.4" | gmt text -F+f13,Helvetica,black+j5 -D0.2/0.2
 
-
-#gmt colorbar -D13c/3c/4c/0.2c -Ctmp_dem.cpt -B1000::/:mm:
 gmt colorbar -Dx13c/1c+w4c/0.2c -Ctmp_Dem.cpt -Bx1000 -By+lm
 
 rm tmp*
